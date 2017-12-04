@@ -33,9 +33,12 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\dll\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\dll\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="ModLoader">
       <HintPath>..\ModLoader\bin\Debug\ModLoader.dll</HintPath>
@@ -48,19 +51,19 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.dll</HintPath>
+      <HintPath>..\dll\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.Analytics.dll</HintPath>
+      <HintPath>..\dll\UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.Networking.dll</HintPath>
+      <HintPath>..\dll\UnityEngine.Networking.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\dll\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
