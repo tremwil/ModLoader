@@ -38,7 +38,7 @@ namespace WeaponEditor
         FixedLaserLauncher = 29,
         LightSword = 30,
         LargeMinigun = 31,
-        // Missing 32
+        GodGun = 32,
         M1Garand = 33,
         SnakeMinigun = 34,
         // Missing 35
