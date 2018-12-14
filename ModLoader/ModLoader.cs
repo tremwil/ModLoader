@@ -164,7 +164,7 @@ namespace ModLoader
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.BackQuote))
+            if (Input.GetKeyDown(KeyCode.Semicolon))
             {
                 showConsole = !showConsole;
                 focusNextGUI = showConsole;
@@ -213,7 +213,7 @@ namespace ModLoader
                     GUILayout.Label(logText);
                     GUILayout.EndScrollView();
 
-                    if (Event.current.type == EventType.keyDown)
+                    if (Event.current.type == EventType.KeyDown)
                     {
                         if (Event.current.keyCode == KeyCode.Return)
                         {
@@ -222,7 +222,7 @@ namespace ModLoader
                             typedCmd = "";
                             Event.current.Use();
                         }
-                        if (Event.current.keyCode == KeyCode.BackQuote)
+                        if (Event.current.keyCode == KeyCode.Semicolon)
                         {
                             showConsole = false;
                             typedCmd = "";

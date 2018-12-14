@@ -5,11 +5,7 @@ VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModLoader", "ModLoader\ModLoader.csproj", "{65E39AFA-11AE-4E99-8722-3A192B5FF3E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHack", "SuperHack\SuperHack.csproj", "{A24F206C-CDB9-4618-B2F6-6291A6DB3F10}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeaponEditor", "WeaponEditor\WeaponEditor.csproj", "{649FD05D-94ED-4191-B7DC-A03A1117D59D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KickTool", "KickTool\KickTool.csproj", "{B953AC39-9E95-40D6-8F4D-30DDD076B124}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPTools", "CPTools\CPTools.csproj", "{54386BE5-41F4-4CB6-9C97-31694548CAC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +17,10 @@ Global
 		{65E39AFA-11AE-4E99-8722-3A192B5FF3E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65E39AFA-11AE-4E99-8722-3A192B5FF3E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65E39AFA-11AE-4E99-8722-3A192B5FF3E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A24F206C-CDB9-4618-B2F6-6291A6DB3F10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A24F206C-CDB9-4618-B2F6-6291A6DB3F10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A24F206C-CDB9-4618-B2F6-6291A6DB3F10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A24F206C-CDB9-4618-B2F6-6291A6DB3F10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{649FD05D-94ED-4191-B7DC-A03A1117D59D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{649FD05D-94ED-4191-B7DC-A03A1117D59D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{649FD05D-94ED-4191-B7DC-A03A1117D59D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{649FD05D-94ED-4191-B7DC-A03A1117D59D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B953AC39-9E95-40D6-8F4D-30DDD076B124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B953AC39-9E95-40D6-8F4D-30DDD076B124}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B953AC39-9E95-40D6-8F4D-30DDD076B124}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B953AC39-9E95-40D6-8F4D-30DDD076B124}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54386BE5-41F4-4CB6-9C97-31694548CAC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54386BE5-41F4-4CB6-9C97-31694548CAC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54386BE5-41F4-4CB6-9C97-31694548CAC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54386BE5-41F4-4CB6-9C97-31694548CAC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
