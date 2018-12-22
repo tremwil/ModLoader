@@ -5,35 +5,20 @@ using System.Text;
 using Harmony;
 using System.Reflection;
 using UnityEngine;
+using HumanAPI;
 
 namespace CPTools
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class StaticConstructorOnStartup : Attribute
-    {
-    }
-
-    [StaticConstructorOnStartup]
-    static class PatchManager
-    {
-        static PatchManager()
-        {
-
-        }
-    }
-
     [HarmonyPatch(typeof(Game))]
     [HarmonyPatch("Respawn", typeof(Human), typeof(Vector3))]
     class RespawnPatch
     {
         static void Postfix(Human human, Vector3 offset)
         {
-            Debug.Log("Respawn called");
-
             var spndata = human.GetComponent<SpawnpointData>();
             if (spndata == null || !spndata.enabled) { return; }
 
-            human.SpawnAt(spndata.spawnpoint + Vector3.up);
+            human.SpawnAt(spndata.spawnpoint);
         }
     }
 
@@ -46,34 +31,62 @@ namespace CPTools
             foreach (Human h in Human.all)
             {
                 var spndata = h.GetComponent<SpawnpointData>();
-                if (spndata != null) { spndata.enabled = false; }
+                if (spndata != null)
+                {
+                    spndata.spawnpoint = Game.currentLevel.checkpoints[0].position;
+                    spndata.cpNumber = 0;
+                }
             }
 
             return true;
         }
     }
 
-    [HarmonyPatch(typeof(Human))]
-    [HarmonyPatch("SpawnAt", typeof(Vector3))]
-    class HumanSpawnPatch
+    //[HarmonyPatch(typeof(Human))]
+    //[HarmonyPatch("SpawnAt", typeof(Vector3))]
+    //class HumanSpawnPatch
+    //{
+    //    static bool Prefix(Human __instance, Vector3 pos)
+    //    {
+    //        var spndata = __instance.GetComponent<SpawnpointData>();
+    //        if (spndata == null || !spndata.enabled) { return true; }
+
+    //        __instance.state = HumanState.Spawning;
+    //        Vector3 a = __instance.KillHorizontalVelocity();
+    //        Vector3 position = pos;
+
+    //        __instance.SetPosition(position);
+    //        if (a.magnitude < 5f)
+    //        {
+    //            __instance.AddRandomTorque(1f);
+    //        }
+    //        __instance.Reset();
+
+    //        return false;
+    //    }
+    //}
+
+    [HarmonyPatch(typeof(Checkpoint))]
+    [HarmonyPatch("OnTriggerEnter", typeof(Collider))]
+    class CheckpointTriggerPatch
     {
-        static bool Prefix(Human __instance, Vector3 pos)
+        static void Postfix(Checkpoint __instance, Collider other)
         {
-            var spndata = __instance.GetComponent<SpawnpointData>();
-            if (spndata == null || !spndata.enabled) { return true; }
-
-            __instance.state = HumanState.Spawning;
-            Vector3 a = __instance.KillHorizontalVelocity();
-            Vector3 position = pos;
-
-            __instance.SetPosition(position);
-            if (a.magnitude < 5f)
+            if (!__instance.enabled)
             {
-                __instance.AddRandomTorque(1f);
+                return;
             }
-            __instance.Reset();
-
-            return false;
+            if (other.tag != "Player")
+            {
+                return;
+            }
+            Human h = other.GetComponent<Human>();
+            SpawnpointData spndata = h.GetComponent<SpawnpointData>();
+            if (spndata != null && spndata.enabled && spndata.cpNumber < __instance.number && !spndata.customSpawn)
+            {
+                spndata.spawnpoint = Game.currentLevel.checkpoints[__instance.number].position;
+                spndata.cpNumber = __instance.number;
+            }
         }
     }
 }

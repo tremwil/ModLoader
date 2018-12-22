@@ -9,5 +9,8 @@ namespace CPTools
     public class SpawnpointData : MonoBehaviour
     {
         public Vector3 spawnpoint = Vector3.zero;
+        public bool customSpawn = false;
+
+        public int cpNumber = 0;
     }
 }

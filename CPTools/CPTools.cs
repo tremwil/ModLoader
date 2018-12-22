@@ -11,11 +11,11 @@ using System.Reflection;
 namespace CPTools
 {
     [ModEntryPoint]
-    public class CPTools : MonoBehaviour, ICommandHandler
+    public class CPToolsMod : MonoBehaviour, ICommandHandler
     {
         ModLoader.ModLoader loader;
 
-        public static CPTools Instance { get; private set; }
+        public static CPToolsMod Instance { get; private set; }
 
         bool cpTriggers = true;
         int lastLvlId = 0;
@@ -40,17 +40,20 @@ namespace CPTools
 
         void Update()
         {
-            if (lastLvlId != Game.instance.currentLevelNumber)
+            if (GetLocalHuman() != null && GetLocalHuman().player.host.isLocal)
             {
-                ToggleCheckpointTriggers(cpTriggers);
-
-                foreach (Human h in Human.all)
+                if (lastLvlId != Game.instance.currentLevelNumber)
                 {
-                    var spndata = h.GetComponent<SpawnpointData>();
-                    if (spndata != null) { spndata.enabled = false; }
+                    ToggleCheckpointTriggers(cpTriggers);
+
+                    foreach (Human h in Human.all)
+                    {
+                        var spndata = h.GetComponent<SpawnpointData>();
+                        if (spndata != null) { spndata.enabled = false; }
+                    }
                 }
+                lastLvlId = Game.instance.currentLevelNumber;
             }
-            lastLvlId = Game.instance.currentLevelNumber;
         }
 
         void ToggleCheckpointTriggers(bool state)
@@ -70,18 +73,25 @@ namespace CPTools
             return null;
         }
 
-        public HashSet<string> CommandNames => new HashSet<string>() { "cp-set", "cp-reset", "cp-toggle" };
+        public HashSet<string> CommandNames => new HashSet<string>() { "cp-state", "cp-set", "cp-toggle", "cp-reset" };
 
         public void OnCommandTyped(string cmd, string[] args)
         {
+            Human hl = GetLocalHuman();
+            if (hl == null)
+            {
+                loader.LogLine("[cp] Could not get Human object");
+                return;
+            }
+            else if (!hl.player.host.isLocal)
+            {
+                loader.LogLine("[cp] Not the server host, may not run cp commands");
+                return;
+            }
+
             switch (cmd)
             {
                 case "cp-toggle":
-                    if (!Multiplayer.NetGame.isServer)
-                    {
-                        loader.LogLine("[cp-toggle] Not the game host");
-                        return;
-                    }
                     if (args.Length == 0)
                     {
                         cpTriggers = !cpTriggers;
@@ -93,64 +103,97 @@ namespace CPTools
                     }
                     ToggleCheckpointTriggers(cpTriggers);
                     loader.Log(string.Format("[cp-toggle] {0} checkpoint triggers", cpTriggers ? "Enabled" : "Disabled"));
-
                     break;
 
-                case "cp-reset":
-                    Human h = GetLocalHuman();
-                    if (h == null)
+                case "cp-state":
+                    if (args.Length == 0 || !bool.TryParse(args[0], out bool state))
                     {
-                        loader.LogLine("[cp-reset] Could not get Human object");
+                        loader.LogLine("[cp-set] Invalid boolean input");
                         return;
                     }
-                    if (!Multiplayer.NetGame.isServer)
+                    Human[] toSet = SelectHumans((args.Length < 2) ? "all" : args[1]).ToArray();
+                    if (toSet.Length == 0)
                     {
-                        loader.LogLine("[cp-reset] Not the game host");
+                        loader.LogLine("[cp-set] Cannot find player given");
                         return;
                     }
-                    var spndata = h.GetComponent<SpawnpointData>();
-                    if (spndata != null)
+                    foreach (var h in toSet)
                     {
-                        spndata.enabled = false;
+                        var spndata = h.GetComponent<SpawnpointData>();
+                        if (spndata == null)
+                        {
+                            h.gameObject.AddComponent<SpawnpointData>();
+                            spndata = h.GetComponent<SpawnpointData>();
+                        }
+                        spndata.enabled = state;
                     }
-                    loader.LogLine("[cp-reset] Disabled player-specific checkpoints");
 
+                    loader.LogLine(string.Format("[cp-reset] {0} custom checkpoints for target", state? "Enabled" : "Disabled"));
                     break;
 
                 case "cp-set":
-                    h = GetLocalHuman();
-                    if (h == null)
+                    toSet = SelectHumans((args.Length == 0) ? "" : args[0]).ToArray();
+                    if (toSet.Length == 0)
                     {
-                        loader.LogLine("[cp-set] Could not get Human object");
+                        loader.LogLine("[cp-set] Cannot find player given");
                         return;
                     }
-                    List<Human> toSet = new List<Human>() { h };
-                    if (args.Length > 0 && args[0] == "all")
-                    {
-                        if (!Multiplayer.NetGame.isServer)
-                        {
-                            loader.LogLine("[cp-set] Not the game host");
-                            return;
-                        }
-                        loader.LogLine("[cp-set] Setting spawn for all players");
-                        toSet = Human.all;
-                    }
 
-                    foreach (var hu in toSet)
+                    foreach (var h in toSet)
                     {
-                        spndata = hu.GetComponent<SpawnpointData>();
+                        var spndata = h.GetComponent<SpawnpointData>();
                         if (spndata == null)
                         {
-                            hu.gameObject.AddComponent<SpawnpointData>();
-                            spndata = hu.GetComponent<SpawnpointData>();
+                            h.gameObject.AddComponent<SpawnpointData>();
+                            spndata = h.GetComponent<SpawnpointData>();
                         }
-                        spndata.enabled = true;
-                        spndata.spawnpoint = h.transform.position + Vector3.up;
+                        spndata.customSpawn = true;
+                        spndata.spawnpoint = hl.transform.position;
                     }
 
-                    loader.LogLine("[cp-set] Set spawnpoint to " + (h.transform.position + Vector3.up).ToString());
-
+                    loader.LogLine("[cp-set] Set spawnpoint to " + hl.transform.position.ToString());
                     break;
+
+                case "cp-reset":
+                    toSet = SelectHumans((args.Length == 0) ? "" : args[0]).ToArray();
+                    if (toSet.Length == 0)
+                    {
+                        loader.LogLine("[cp-reset] Cannot find player given");
+                        return;
+                    }
+
+                    foreach (var h in toSet)
+                    {
+                        var spndata = h.GetComponent<SpawnpointData>();
+                        if (spndata == null)
+                        {
+                            h.gameObject.AddComponent<SpawnpointData>();
+                            spndata = h.GetComponent<SpawnpointData>();
+                        }
+                        spndata.customSpawn = false;
+                    }
+
+                    loader.LogLine("[cp-reset] Removed custom spawn ");
+                    break;
+            }
+        }
+
+        IEnumerable<Human> SelectHumans(string selector)
+        {
+            if (selector == "")
+            {
+                yield return GetLocalHuman();
+            }
+            else if (selector.ToLower() == "all")
+            {
+                foreach (Human h in Human.all) { yield return h; };
+            }
+            else
+            {
+                foreach (Human h in Human.all)
+                {
+                    if (h.player.name == selector) { yield return h; }
+                }
             }
         }
 
@@ -159,9 +202,9 @@ namespace CPTools
             switch (cmd)
             {
                 case "cp-set":
-                    return "Usage: cp-set (all)\nSets the checkpoint of the current (or all players) to the given position.";
-                case "cp-reset":
-                    return "Usage: cp-reset\nDisables player-specific checkpoints for all players.";
+                    return "Usage: cp-set (<player>|all)\nSets the checkpoint of the current (or given or all players) to the given position.";
+                case "cp-state":
+                    return "Usage: cp-state [true|false] (player)\nDisables or enables custom checkpoints for some or all players.";
                 case "cp-toggle":
                     return "Usage: cp-toggle (true|false)\nToggles auto checkpoint trigger boxes";
             }
