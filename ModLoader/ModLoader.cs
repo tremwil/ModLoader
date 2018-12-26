@@ -68,7 +68,7 @@ namespace ModLoader
 
         void Awake()
         {
-            LogLine("SFTG Mod Loader V1.0\n");
+            LogLine("General Unity Mod Loader V1.1\n");
 
             Application.logMessageReceived += Application_logMessageReceived;
 
@@ -240,7 +240,7 @@ namespace ModLoader
                     }
 
                     GUI.DragWindow();
-                }, "SFTG Mod Loader V1.0");
+                }, "General Unity Mod Loader V1.1");
             }
         }
 
