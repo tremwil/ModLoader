@@ -5,7 +5,6 @@ using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.IO;
-using UnityEngine;
 
 namespace AutoInstaller
 {
@@ -13,6 +12,10 @@ namespace AutoInstaller
     {
         public static void InjectMLLoader(string asmPath, string outAsmPath)
         {
+            // Cecil is strange and requires the physics module
+            bool ex = File.Exists("UnityEngine.PhysicsModule.dll");
+            if (!ex) { File.WriteAllBytes("UnityEngine.PhysicsModule.dll", RequiredDlls.UnityEngine_PhysicsModule); }
+
             AssemblyDefinition asm = AssemblyDefinition.ReadAssembly(asmPath);
             asm.MainModule.ModuleReferences.Add(new ModuleReference("ModLoader.dll"));
 
@@ -36,6 +39,8 @@ namespace AutoInstaller
 
             asm.Write(outAsmPath);
             asm.Dispose();
+
+            if (!ex) { File.Delete("UnityEngine.PhysicsModule.dll"); }
         }
     }
 }

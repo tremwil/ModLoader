@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.IO;
+using System.Threading;
 
 namespace AutoInstaller
 {
@@ -28,6 +29,7 @@ namespace AutoInstaller
 
             if (AppSettings.Default.rememberPath && Directory.Exists(AppSettings.Default.dirPath))
             {
+                saveCb.Checked = AppSettings.Default.rememberPath;
                 dataDirectory = AppSettings.Default.dirPath;
                 exePathTb.Text = AppSettings.Default.exePath;
                 btnInstall.Enabled = true;
@@ -39,7 +41,7 @@ namespace AutoInstaller
             logTB.Text = progressLog.ToString();
         }
 
-        public bool Patch()
+        public bool Install()
         {
             if (!Directory.Exists(dataDirectory + "\\Mods"))
             {
@@ -56,11 +58,11 @@ namespace AutoInstaller
                 return false;
             }
 
-            File.Copy("ModLoader.dll", managedPath + "ModLoader.dll", true);
+            File.WriteAllBytes(managedPath + "ModLoader.dll", RequiredDlls.ModLoader);
             Console.WriteLine("[Copy] ModLoader.dll -> " + managedPath);
             progressBar.Value++;
 
-            File.Copy("0Harmony.dll", managedPath + "0Harmony.dll", true);
+            File.WriteAllBytes(managedPath + "0Harmony.dll", RequiredDlls._0Harmony);
             Console.WriteLine("[Copy] 0Harmony.dll -> " + managedPath);
             progressBar.Value++;
 
@@ -78,12 +80,20 @@ namespace AutoInstaller
             Console.WriteLine("[End patch] Assembly-CSharp.patched.dll");
             progressBar.Value++;
 
-            File.Copy(managedPath + "Assembly-CSharp.dll", managedPath + "Assembly-CSharp.original.dll", true);
-            Console.WriteLine("[Rename] Assembly-CSharp.dll -> Assembly-CSharp.original.dll");
+            if (File.Exists(managedPath + "Assembly-CSharp.original.dll"))
+            {
+                Console.WriteLine("[Backup] File Assembly-CSharp.original.dll already exists");
+            }
+            else
+            {
+                File.Copy(managedPath + "Assembly-CSharp.dll", managedPath + "Assembly-CSharp.original.dll", true);
+                Console.WriteLine("[Backup] Assembly-CSharp.dll -> Assembly-CSharp.original.dll");
+            }
+            
             progressBar.Value++;
 
             File.Copy(managedPath + "Assembly-CSharp.patched.dll", managedPath + "Assembly-CSharp.dll", true);
-            Console.Write("[Copy] Assembly-CSharp.patched.dll -> Assembly-CSharp.dll");
+            Console.Write("[Replace] Assembly-CSharp.patched.dll -> Assembly-CSharp.dll");
             progressBar.Value++;
 
             return true;
@@ -95,13 +105,13 @@ namespace AutoInstaller
             progressBar.Maximum = 8;
             progressBar.Value = 0;
 
-            if (Patch())
+            if (Install())
             {
                 MessageBox.Show("ModLoader installed successfully!", "ModLoader Installer");
             }
             else
             {
-                MessageBox.Show("An error occured during the installation. Please check the logs.", 
+                MessageBox.Show("An error occured during the installation. Please check the logs.",
                     "ModLoader Installer", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 progressBar.Value = 0;
             }
